@@ -10,8 +10,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css';" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"
+        onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.css';" />
     <style>
         :root {
             --bg: #f4f8ef;
@@ -556,7 +558,7 @@
 
         .map-toolbar {
             display: grid;
-            grid-template-columns: 1fr auto auto;
+            grid-template-columns: 1fr auto auto auto;
             gap: 10px;
             margin-bottom: 10px;
         }
@@ -592,6 +594,20 @@
         .map-action {
             white-space: nowrap;
             padding-inline: 16px;
+        }
+
+        .device-place-tools {
+            margin-bottom: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .device-place-tools .map-mini-btn.is-active {
+            border-color: #2a9954;
+            color: #175a33;
+            background: #e9f8ee;
+            box-shadow: 0 0 0 3px rgba(38, 148, 79, 0.12);
         }
 
         .farm-map {
@@ -672,6 +688,51 @@
         .status-chip.high {
             background: #ffedeb;
             color: #9a3528;
+        }
+
+        .saved-farms {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(19, 33, 22, 0.14);
+        }
+
+        .saved-farms label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4f6154;
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+
+        .saved-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .saved-select {
+            width: 100%;
+            border: 1px solid rgba(19, 33, 22, 0.18);
+            border-radius: 12px;
+            background: #fff;
+            font: inherit;
+            color: var(--ink);
+            padding: 10px 12px;
+            min-height: 44px;
+        }
+
+        .saved-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--ring);
+        }
+
+        .map-mini-btn {
+            padding: 10px 13px;
+            border-radius: 12px;
+            font-size: 0.86rem;
+            min-height: 44px;
         }
 
         .device-list {
@@ -796,6 +857,12 @@
 
         .leaflet-draw-actions a {
             font-size: 0.85rem;
+        }
+
+        .map-hint {
+            margin: 10px 0 0;
+            font-size: 0.85rem;
+            color: #55665b;
         }
 
         .contact-panel {
@@ -1006,11 +1073,24 @@
             }
 
             .map-toolbar {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr;
             }
 
             .map-search {
                 grid-column: 1 / -1;
+            }
+
+            .saved-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .saved-select {
+                grid-column: 1 / -1;
+            }
+
+            .device-place-tools {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
             }
 
             .farm-map {
@@ -1062,6 +1142,18 @@
 
             .map-action {
                 width: 100%;
+            }
+
+            .saved-row {
+                grid-template-columns: 1fr;
+            }
+
+            .map-mini-btn {
+                width: 100%;
+            }
+
+            .device-place-tools {
+                grid-template-columns: 1fr;
             }
 
             .farm-map {
@@ -1279,9 +1371,22 @@
                         </label>
                         <button id="startDrawBtn" class="btn btn-primary map-action" type="button">Fermer yerini
                             belgilash</button>
+                        <button id="saveFarmBtn" class="btn btn-secondary map-action" type="button">Yerni
+                            saqlash</button>
                         <button id="clearFarmBtn" class="btn btn-secondary map-action" type="button">Maydonni
                             tozalash</button>
                     </div>
+
+                    <div class="device-place-tools">
+                        <button id="startDeviceDropBtn" class="btn btn-secondary map-mini-btn" type="button">Asbobni
+                            qo'lda joylash</button>
+                        <button id="autoDeviceBtn" class="btn btn-secondary map-mini-btn" type="button">Auto
+                            lokatsiya qo'shish</button>
+                        <button id="cancelDeviceDropBtn" class="btn btn-secondary map-mini-btn" type="button">Joylashni
+                            bekor qilish</button>
+                    </div>
+                    <p id="devicePlaceHint" class="map-hint">Yer ichida asbob qo'shish uchun avval maydonni
+                        belgilang.</p>
 
                     <div id="farmMap" class="farm-map" aria-label="Fermer xaritasi" role="region"></div>
 
@@ -1301,6 +1406,22 @@
                             <span class="status-chip low">Kam: <strong id="lowCount">0</strong></span>
                             <span class="status-chip normal">Normal: <strong id="normalCount">0</strong></span>
                             <span class="status-chip high">Oshiq: <strong id="highCount">0</strong></span>
+                        </div>
+
+                        <div class="saved-farms">
+                            <label for="savedFarmsSelect">Saqlangan fermer yerlar</label>
+                            <div class="saved-row">
+                                <select id="savedFarmsSelect" class="saved-select"
+                                    aria-label="Saqlangan yerlar ro'yxati">
+                                    <option value="">Saqlangan yer yo'q</option>
+                                </select>
+                                <button id="loadFarmBtn" class="btn btn-secondary map-mini-btn"
+                                    type="button">Yuklash</button>
+                                <button id="deleteFarmBtn" class="btn btn-secondary map-mini-btn"
+                                    type="button">O'chirish</button>
+                            </div>
+                            <p class="map-hint">Yer chizilgach "Yerni saqlash" tugmasi orqali keyingi kirishda ham
+                                saqlanib qoladi.</p>
                         </div>
 
                         <div id="deviceList" class="device-list">
@@ -1403,8 +1524,10 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"
+        onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/leaflet-draw@1.0.4/dist/leaflet.draw.js';"></script>
 
     <script>
         const menuBtn = document.getElementById('menuBtn');
@@ -1433,7 +1556,15 @@
         const farmMapElement = document.getElementById('farmMap');
         const farmSearch = document.getElementById('farmSearch');
         const startDrawBtn = document.getElementById('startDrawBtn');
+        const saveFarmBtn = document.getElementById('saveFarmBtn');
         const clearFarmBtn = document.getElementById('clearFarmBtn');
+        const startDeviceDropBtn = document.getElementById('startDeviceDropBtn');
+        const autoDeviceBtn = document.getElementById('autoDeviceBtn');
+        const cancelDeviceDropBtn = document.getElementById('cancelDeviceDropBtn');
+        const devicePlaceHint = document.getElementById('devicePlaceHint');
+        const savedFarmsSelect = document.getElementById('savedFarmsSelect');
+        const loadFarmBtn = document.getElementById('loadFarmBtn');
+        const deleteFarmBtn = document.getElementById('deleteFarmBtn');
         const selectedAreaName = document.getElementById('selectedAreaName');
         const mapSummary = document.getElementById('mapSummary');
         const selectedCount = document.getElementById('selectedCount');
@@ -1526,6 +1657,26 @@
             yunusobod: [41.3652, 69.2887],
             novza: [41.28796, 69.2009],
             qatortol: [41.28321, 69.2017]
+        };
+
+        const FARM_STORAGE_KEY = 'jahonAgro.savedFarmAreas.v1';
+        const FARM_ACTIVE_KEY = 'jahonAgro.activeFarmAreaId.v1';
+
+        const readLocalStorage = (key) => {
+            try {
+                return window.localStorage.getItem(key);
+            } catch {
+                return null;
+            }
+        };
+
+        const writeLocalStorage = (key, value) => {
+            try {
+                window.localStorage.setItem(key, value);
+                return true;
+            } catch {
+                return false;
+            }
         };
 
         menuBtn?.addEventListener('click', () => {
@@ -1694,13 +1845,18 @@
             deviceList.innerHTML = sensors
                 .map((sensor) => {
                     const status = getSensorStatus(sensor);
+                    const sourceLabel = sensor.source === 'auto'
+                        ? 'Auto lokatsiya'
+                        : sensor.source === 'manual'
+                            ? "Qo'lda belgilangan"
+                            : '';
                     return `
                         <article class="device-row">
                             <div class="device-left">
                                 <span class="device-icon ${status.tone}">${escapeHTML(sensor.code)}</span>
                                 <div>
                                     <p class="device-id">${escapeHTML(sensor.code)}</p>
-                                    <p class="device-name">${escapeHTML(sensor.name)}</p>
+                                    <p class="device-name">${escapeHTML(sensor.name)}${sourceLabel ? ` · ${sourceLabel}` : ''}</p>
                                 </div>
                             </div>
                             <div class="device-right">
@@ -1744,6 +1900,15 @@
                 .replace(/\s+/g, ' ')
                 .trim();
 
+        const clampMoisture = (value) => {
+            const numericValue = Number(value);
+            if (!Number.isFinite(numericValue)) {
+                return 55;
+            }
+
+            return Math.max(0, Math.min(100, Math.round(numericValue)));
+        };
+
         const setupFarmMap = () => {
             if (!farmMapElement || !window.L || !mapSummary || !selectedAreaName || !farmSearch) {
                 return;
@@ -1754,30 +1919,196 @@
                 scrollWheelZoom: true
             }).setView([41.28555, 69.20544], 15);
 
-            L.control.zoom({ position: 'right' }).addTo(map);
+            L.control.zoom({ position: 'topright' }).addTo(map);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
 
-            const parcelLayer = L.featureGroup().addTo(map);
+            const backupLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                subdomains: 'abcd',
+                maxZoom: 20,
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+            });
 
-            const drawControl = new L.Control.Draw({
-                position: 'topright',
-                draw: false,
-                edit: {
-                    featureGroup: parcelLayer,
-                    remove: false
+            let tileErrorCount = 0;
+            osmLayer.on('tileerror', () => {
+                tileErrorCount += 1;
+                if (tileErrorCount >= 3 && !map.hasLayer(backupLayer)) {
+                    backupLayer.addTo(map);
                 }
             });
 
-            map.addControl(drawControl);
+            const parcelLayer = L.featureGroup().addTo(map);
+            const manualSensorLayer = L.layerGroup().addTo(map);
+
+            let drawHandler = null;
+            let activePolygonLayer = null;
+            let activePolygonLatLngs = [];
+            let activeFarmId = '';
+            let savedFarms = [];
+            let activeManualSensors = [];
+            let isDeviceDropMode = false;
+            let manualSensorSequence = 1;
 
             const toneColors = {
                 low: '#d79924',
                 normal: '#23a154',
                 high: '#cf4a3c'
+            };
+
+            const normalizePoints = (points = []) =>
+                points
+                    .map((point) => ({
+                        lat: Number(point.lat),
+                        lng: Number(point.lng)
+                    }))
+                    .filter((point) => Number.isFinite(point.lat) && Number.isFinite(point.lng));
+
+            const serializePoints = (points = []) =>
+                normalizePoints(points).map((point) => ({
+                    lat: point.lat,
+                    lng: point.lng
+                }));
+
+            const syncManualSequence = () => {
+                const manualMaxCode = activeManualSensors.reduce((maxCode, sensor) => {
+                    const match = String(sensor.code || '').match(/^Q(\d+)$/i);
+                    if (!match) {
+                        return maxCode;
+                    }
+
+                    return Math.max(maxCode, Number(match[1]));
+                }, 0);
+
+                manualSensorSequence = manualMaxCode + 1;
+            };
+
+            const getNextManualCode = () => {
+                const usedCodes = new Set(
+                    [...farmSensors, ...activeManualSensors].map((sensor) => String(sensor.code || ''))
+                );
+
+                let generatedCode = `Q${manualSensorSequence}`;
+
+                while (usedCodes.has(generatedCode)) {
+                    manualSensorSequence += 1;
+                    generatedCode = `Q${manualSensorSequence}`;
+                }
+
+                manualSensorSequence += 1;
+                return generatedCode;
+            };
+
+            const sanitizeManualSensors = (sensors = []) =>
+                (Array.isArray(sensors) ? sensors : [])
+                    .map((sensor, index) => {
+                        const lat = Number(sensor.lat);
+                        const lng = Number(sensor.lng);
+
+                        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+                            return null;
+                        }
+
+                        return {
+                            id: String(sensor.id || `manual-${Date.now()}-${index}`),
+                            code: String(sensor.code || `Q${index + 1}`),
+                            name: String(sensor.name || "Qo'lda belgilangan asbob"),
+                            lat,
+                            lng,
+                            moisture: clampMoisture(sensor.moisture),
+                            optimalMin: Number(sensor.optimalMin) || 40,
+                            optimalMax: Number(sensor.optimalMax) || 70,
+                            source: sensor.source === 'auto' ? 'auto' : 'manual',
+                            isManual: true
+                        };
+                    })
+                    .filter(Boolean);
+
+            const serializeManualSensors = (sensors = []) =>
+                sensors.map((sensor) => ({
+                    id: String(sensor.id),
+                    code: String(sensor.code),
+                    name: String(sensor.name),
+                    lat: Number(sensor.lat),
+                    lng: Number(sensor.lng),
+                    moisture: clampMoisture(sensor.moisture),
+                    optimalMin: Number(sensor.optimalMin) || 40,
+                    optimalMax: Number(sensor.optimalMax) || 70,
+                    source: sensor.source === 'auto' ? 'auto' : 'manual'
+                }));
+
+            const persistSavedFarms = () => {
+                writeLocalStorage(FARM_STORAGE_KEY, JSON.stringify(savedFarms));
+                writeLocalStorage(FARM_ACTIVE_KEY, activeFarmId || '');
+            };
+
+            const refreshSavedFarmsUI = () => {
+                if (!savedFarmsSelect || !loadFarmBtn || !deleteFarmBtn) {
+                    return;
+                }
+
+                if (!savedFarms.length) {
+                    savedFarmsSelect.innerHTML = '<option value="">Saqlangan yer yo\'q</option>';
+                    savedFarmsSelect.disabled = true;
+                    loadFarmBtn.disabled = true;
+                    deleteFarmBtn.disabled = true;
+                    return;
+                }
+
+                const optionsMarkup = savedFarms
+                    .map((farm) => `<option value="${escapeHTML(farm.id)}">${escapeHTML(farm.name)}</option>`)
+                    .join('');
+
+                savedFarmsSelect.innerHTML = optionsMarkup;
+
+                if (savedFarms.some((farm) => farm.id === activeFarmId)) {
+                    savedFarmsSelect.value = activeFarmId;
+                } else {
+                    savedFarmsSelect.value = savedFarms[savedFarms.length - 1].id;
+                }
+
+                savedFarmsSelect.disabled = false;
+                loadFarmBtn.disabled = false;
+                deleteFarmBtn.disabled = false;
+            };
+
+            const syncActiveFarmManualSensors = () => {
+                if (!activeFarmId) {
+                    return;
+                }
+
+                const farmIndex = savedFarms.findIndex((farm) => farm.id === activeFarmId);
+                if (farmIndex < 0) {
+                    return;
+                }
+
+                savedFarms[farmIndex].manualSensors = serializeManualSensors(activeManualSensors);
+                persistSavedFarms();
+            };
+
+            const renderManualSensorMarkers = () => {
+                manualSensorLayer.clearLayers();
+
+                activeManualSensors.forEach((sensor) => {
+                    const status = getSensorStatus(sensor);
+                    const strokeColor = sensor.source === 'auto' ? '#1f68dd' : '#1a8f72';
+
+                    const marker = L.circleMarker([sensor.lat, sensor.lng], {
+                        radius: 9,
+                        color: strokeColor,
+                        weight: 2,
+                        fillColor: toneColors[status.tone],
+                        fillOpacity: 0.95
+                    }).addTo(manualSensorLayer);
+
+                    marker.bindPopup(
+                        `<strong>Asbob ${escapeHTML(sensor.code)}</strong><br>${escapeHTML(sensor.name)}<br>${sensor.source === 'auto' ? 'Auto lokatsiya' : "Qo'lda belgilangan"}<br>${status.label}: <strong>${sensor.moisture}%</strong>`
+                    );
+
+                    sensor.marker = marker;
+                });
             };
 
             const highlightSensorMarkers = (sensors = null) => {
@@ -1795,6 +2126,109 @@
                         radius: active ? 8.5 : 6.5
                     });
                 });
+
+                activeManualSensors.forEach((sensor) => {
+                    if (!sensor.marker) {
+                        return;
+                    }
+
+                    const active = !activeCodes || activeCodes.has(sensor.code);
+                    sensor.marker.setStyle({
+                        fillOpacity: active ? 0.95 : 0.28,
+                        opacity: active ? 1 : 0.35,
+                        radius: active ? 9 : 7
+                    });
+                });
+            };
+
+            const stopDeviceDropMode = (hintText = "Yer ichida asbob qo'shish uchun tugmani bosing.") => {
+                isDeviceDropMode = false;
+                startDeviceDropBtn?.classList.remove('is-active');
+
+                if (devicePlaceHint) {
+                    devicePlaceHint.textContent = hintText;
+                }
+
+                map.getContainer().style.cursor = '';
+            };
+
+            const startDeviceDropMode = () => {
+                if (activePolygonLatLngs.length < 3) {
+                    mapSummary.textContent = "Avval fermer yerini belgilang, keyin asbob joyini xaritada bosing.";
+                    return;
+                }
+
+                isDeviceDropMode = true;
+                startDeviceDropBtn?.classList.add('is-active');
+
+                if (devicePlaceHint) {
+                    devicePlaceHint.textContent = "Qo'lda joylash rejimi yoqildi: endi xaritada tanlangan yer ichiga bitta nuqta bosing.";
+                }
+
+                mapSummary.textContent = "Xaritada asbob nuqtasini belgilang. Faqat tanlangan yer ichida qo'shiladi.";
+                map.getContainer().style.cursor = 'crosshair';
+            };
+
+            const placeSensorInActiveFarm = (lat, lng, source = 'manual') => {
+                if (activePolygonLatLngs.length < 3) {
+                    mapSummary.textContent = "Avval fermer yer chegarasini belgilang.";
+                    return false;
+                }
+
+                const point = { lat: Number(lat), lng: Number(lng) };
+
+                if (!Number.isFinite(point.lat) || !Number.isFinite(point.lng)) {
+                    mapSummary.textContent = "Asbob joylashuvi noto'g'ri formatda keldi.";
+                    return false;
+                }
+
+                if (!isPointInPolygon(point, activePolygonLatLngs)) {
+                    mapSummary.textContent = "Asbob faqat tanlangan yer ichida qo'yilishi mumkin.";
+                    return false;
+                }
+
+                const moistureInput = window.prompt("Asbob namligi foizini kiriting (0-100):", "55");
+
+                if (moistureInput === null) {
+                    mapSummary.textContent = "Asbob qo'shish bekor qilindi.";
+                    return false;
+                }
+
+                const customNameInput = window.prompt("Asbob nomini kiriting (ixtiyoriy):", "");
+                if (customNameInput === null) {
+                    mapSummary.textContent = "Asbob qo'shish bekor qilindi.";
+                    return false;
+                }
+
+                const nextCode = getNextManualCode();
+                const deviceName = customNameInput.trim()
+                    ? customNameInput.trim()
+                    : source === 'auto'
+                        ? `Auto aniqlangan asbob ${nextCode}`
+                        : `Qo'lda belgilangan asbob ${nextCode}`;
+
+                activeManualSensors.push({
+                    id: `manual-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+                    code: nextCode,
+                    name: deviceName,
+                    lat: point.lat,
+                    lng: point.lng,
+                    moisture: clampMoisture(moistureInput),
+                    optimalMin: 40,
+                    optimalMax: 70,
+                    source,
+                    isManual: true
+                });
+
+                renderManualSensorMarkers();
+                summarizeSelection(activePolygonLatLngs);
+                syncActiveFarmManualSensors();
+
+                mapSummary.textContent = source === 'auto'
+                    ? `${nextCode} asbob auto lokatsiya orqali qo'shildi.`
+                    : `${nextCode} asbob qo'lda joylashtirildi.`;
+
+                return true;
             };
 
             farmSensors.forEach((sensor) => {
@@ -1826,15 +2260,33 @@
                 }
             };
 
+            const polygonStyle = {
+                color: '#2d8f4e',
+                fillColor: '#2d8f4e',
+                fillOpacity: 0.16,
+                weight: 3
+            };
+
             const readPolygonLatLngs = (layer) => {
                 const raw = layer.getLatLngs();
-                return Array.isArray(raw[0]) ? raw[0] : raw;
+                const points = Array.isArray(raw[0]) ? raw[0] : raw;
+                return normalizePoints(points);
+            };
+
+            const selectedSensorsFromPolygon = (polygonLatLngs) => {
+                const baseSensors = farmSensors.filter((sensor) =>
+                    isPointInPolygon({ lat: sensor.lat, lng: sensor.lng }, polygonLatLngs)
+                );
+
+                const manualSensors = activeManualSensors.filter((sensor) =>
+                    isPointInPolygon({ lat: sensor.lat, lng: sensor.lng }, polygonLatLngs)
+                );
+
+                return [...baseSensors, ...manualSensors];
             };
 
             const summarizeSelection = (polygonLatLngs) => {
-                const selectedSensors = farmSensors.filter((sensor) =>
-                    isPointInPolygon({ lat: sensor.lat, lng: sensor.lng }, polygonLatLngs)
-                );
+                const selectedSensors = selectedSensorsFromPolygon(polygonLatLngs);
 
                 const areaSqm = L.GeometryUtil?.geodesicArea ? L.GeometryUtil.geodesicArea(polygonLatLngs) : 0;
                 const areaHectare = areaSqm / 10000;
@@ -1855,8 +2307,36 @@
                 highlightSensorMarkers(selectedSensors);
             };
 
-            const resetSelection = () => {
-                if (farmSearch) {
+            const clearActivePolygon = () => {
+                if (activePolygonLayer) {
+                    parcelLayer.removeLayer(activePolygonLayer);
+                    activePolygonLayer = null;
+                }
+
+                activePolygonLatLngs = [];
+                stopDeviceDropMode("Yer ichida asbob qo'shish uchun avval yangi maydonni belgilang.");
+            };
+
+            const setActivePolygon = (polygonLatLngs, options = { fit: true }) => {
+                const normalized = normalizePoints(polygonLatLngs);
+                if (normalized.length < 3) {
+                    return false;
+                }
+
+                clearActivePolygon();
+                activePolygonLatLngs = normalized;
+                activePolygonLayer = L.polygon(activePolygonLatLngs, polygonStyle).addTo(parcelLayer);
+                summarizeSelection(activePolygonLatLngs);
+
+                if (options.fit) {
+                    map.fitBounds(activePolygonLayer.getBounds(), { padding: [24, 24] });
+                }
+
+                return true;
+            };
+
+            const resetSelection = (clearSearch = true) => {
+                if (farmSearch && clearSearch) {
                     farmSearch.value = '';
                 }
 
@@ -1883,29 +2363,241 @@
                     highCount.textContent = '0';
                 }
 
+                activeManualSensors = [];
+                renderManualSensorMarkers();
+                syncManualSequence();
                 highlightSensorMarkers(null);
+                stopDeviceDropMode("Yer ichida asbob qo'shish uchun tugmani bosing.");
+            };
+
+            const loadSavedFarms = () => {
+                const rawValue = readLocalStorage(FARM_STORAGE_KEY);
+
+                if (!rawValue) {
+                    savedFarms = [];
+                    refreshSavedFarmsUI();
+                    return;
+                }
+
+                try {
+                    const parsedValue = JSON.parse(rawValue);
+
+                    if (!Array.isArray(parsedValue)) {
+                        savedFarms = [];
+                        refreshSavedFarmsUI();
+                        return;
+                    }
+
+                    savedFarms = parsedValue
+                        .map((item) => {
+                            const points = serializePoints(item.points || []);
+                            if (points.length < 3) {
+                                return null;
+                            }
+
+                            return {
+                                id: String(item.id || Date.now()),
+                                name: String(item.name || 'Fermer maydoni'),
+                                points,
+                                manualSensors: sanitizeManualSensors(item.manualSensors || [])
+                            };
+                        })
+                        .filter(Boolean);
+                } catch {
+                    savedFarms = [];
+                }
+
+                refreshSavedFarmsUI();
+            };
+
+            const loadFarmById = (farmId, fitToBounds = true) => {
+                const farm = savedFarms.find((item) => item.id === farmId);
+                if (!farm) {
+                    return;
+                }
+
+                activeFarmId = farm.id;
+                farmSearch.value = farm.name;
+                selectedAreaName.textContent = farm.name;
+
+                activeManualSensors = sanitizeManualSensors(farm.manualSensors || []);
+                syncManualSequence();
+                renderManualSensorMarkers();
+                setActivePolygon(farm.points, { fit: fitToBounds });
+                persistSavedFarms();
+                refreshSavedFarmsUI();
+            };
+
+            const saveCurrentFarm = () => {
+                if (activePolygonLatLngs.length < 3) {
+                    mapSummary.textContent = "Oldin xaritada fermer yerini belgilang, keyin saqlash tugmasini bosing.";
+                    return;
+                }
+
+                const farmName = farmSearch.value.trim() || `Fermer maydoni ${savedFarms.length + 1}`;
+                const points = serializePoints(activePolygonLatLngs);
+                const manualSensors = serializeManualSensors(activeManualSensors);
+                const existingIndex = savedFarms.findIndex((farm) => farm.id === activeFarmId);
+
+                if (existingIndex >= 0) {
+                    savedFarms[existingIndex] = {
+                        ...savedFarms[existingIndex],
+                        name: farmName,
+                        points,
+                        manualSensors
+                    };
+                } else {
+                    activeFarmId = `farm-${Date.now()}`;
+                    savedFarms.push({
+                        id: activeFarmId,
+                        name: farmName,
+                        points,
+                        manualSensors
+                    });
+                }
+
+                selectedAreaName.textContent = farmName;
+                persistSavedFarms();
+                refreshSavedFarmsUI();
+            };
+
+            const restoreLastFarm = () => {
+                if (!savedFarms.length) {
+                    resetSelection();
+                    return;
+                }
+
+                const activeFromStorage = readLocalStorage(FARM_ACTIVE_KEY) || '';
+                const fallbackFarm = savedFarms[savedFarms.length - 1];
+                const farm = savedFarms.find((item) => item.id === activeFromStorage) || fallbackFarm;
+                loadFarmById(farm.id, false);
             };
 
             map.on(L.Draw.Event.CREATED, (event) => {
-                parcelLayer.clearLayers();
-                parcelLayer.addLayer(event.layer);
-                summarizeSelection(readPolygonLatLngs(event.layer));
+                activeFarmId = '';
+                activeManualSensors = [];
+                syncManualSequence();
+                renderManualSensorMarkers();
+                setActivePolygon(readPolygonLatLngs(event.layer));
+                refreshSavedFarmsUI();
+                stopDeviceDropMode("Yangi maydon tayyor. Endi asbob joyini ham belgilashingiz mumkin.");
             });
 
-            map.on(L.Draw.Event.EDITED, (event) => {
-                event.layers.eachLayer((layer) => {
-                    summarizeSelection(readPolygonLatLngs(layer));
-                });
+            map.on('click', (event) => {
+                if (!isDeviceDropMode) {
+                    return;
+                }
+
+                const isPlaced = placeSensorInActiveFarm(event.latlng.lat, event.latlng.lng, 'manual');
+                if (isPlaced) {
+                    stopDeviceDropMode("Asbob joylashtirildi. Kerak bo'lsa yana qo'shish uchun tugmani qayta bosing.");
+                }
             });
 
             startDrawBtn?.addEventListener('click', () => {
-                const drawHandler = new L.Draw.Polygon(map, polygonOptions);
+                if (!window.L.Draw || !window.L.Draw.Polygon) {
+                    mapSummary.textContent = "Xarita chizish moduli yuklanmadi. Internet ulanishni tekshirib, sahifani yangilang.";
+                    return;
+                }
+
+                if (drawHandler) {
+                    drawHandler.disable();
+                }
+
+                stopDeviceDropMode();
+                drawHandler = new L.Draw.Polygon(map, polygonOptions);
                 drawHandler.enable();
+                mapSummary.textContent = "Maydon chegarasini chizing: burchaklarni bosing va so'ng yopib tugating.";
+            });
+
+            startDeviceDropBtn?.addEventListener('click', () => {
+                startDeviceDropMode();
+            });
+
+            cancelDeviceDropBtn?.addEventListener('click', () => {
+                stopDeviceDropMode("Joylash rejimi bekor qilindi.");
+            });
+
+            autoDeviceBtn?.addEventListener('click', () => {
+                if (activePolygonLatLngs.length < 3) {
+                    mapSummary.textContent = "Auto lokatsiya uchun avval fermer yerini belgilang.";
+                    return;
+                }
+
+                if (!navigator.geolocation) {
+                    mapSummary.textContent = "Brauzer geolokatsiyani qo'llab-quvvatlamaydi.";
+                    return;
+                }
+
+                mapSummary.textContent = "Auto lokatsiya aniqlanmoqda...";
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        const isAdded = placeSensorInActiveFarm(latitude, longitude, 'auto');
+
+                        if (isAdded) {
+                            map.flyTo([latitude, longitude], Math.max(map.getZoom(), 16), { duration: 0.8 });
+                        }
+                    },
+                    () => {
+                        mapSummary.textContent = "Lokatsiya olinmadi. Ruxsatni yoqing yoki qo'lda joylash tugmasidan foydalaning.";
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 12000,
+                        maximumAge: 10000
+                    }
+                );
+            });
+
+            saveFarmBtn?.addEventListener('click', () => {
+                saveCurrentFarm();
             });
 
             clearFarmBtn?.addEventListener('click', () => {
-                parcelLayer.clearLayers();
+                clearActivePolygon();
+                activeFarmId = '';
+                persistSavedFarms();
                 resetSelection();
+                refreshSavedFarmsUI();
+            });
+
+            loadFarmBtn?.addEventListener('click', () => {
+                const selectedId = savedFarmsSelect?.value || '';
+                if (!selectedId) {
+                    return;
+                }
+
+                loadFarmById(selectedId);
+            });
+
+            deleteFarmBtn?.addEventListener('click', () => {
+                const selectedId = savedFarmsSelect?.value || '';
+                if (!selectedId) {
+                    return;
+                }
+
+                savedFarms = savedFarms.filter((farm) => farm.id !== selectedId);
+
+                if (activeFarmId === selectedId) {
+                    activeFarmId = '';
+                    clearActivePolygon();
+                    resetSelection();
+                }
+
+                persistSavedFarms();
+                refreshSavedFarmsUI();
+
+                if (savedFarms.length && !activeFarmId) {
+                    loadFarmById(savedFarms[savedFarms.length - 1].id, false);
+                }
+            });
+
+            savedFarmsSelect?.addEventListener('change', () => {
+                activeFarmId = savedFarmsSelect.value;
+                persistSavedFarms();
             });
 
             farmSearch?.addEventListener('keydown', (event) => {
@@ -1931,7 +2623,25 @@
                 mapSummary.textContent = "Hudud topilmadi. Masalan: Chilonzor, Novza yoki Qatortol deb kiriting.";
             });
 
-            resetSelection();
+            loadSavedFarms();
+            restoreLastFarm();
+
+            const onMapResize = () => map.invalidateSize();
+
+            const mapVisibilityObserver = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            map.invalidateSize();
+                        }
+                    });
+                },
+                { threshold: 0.18 }
+            );
+
+            mapVisibilityObserver.observe(farmMapElement);
+            window.addEventListener('resize', onMapResize);
+            setTimeout(onMapResize, 230);
         };
 
         setupFarmMap();
