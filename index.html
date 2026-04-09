@@ -10,6 +10,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
     <style>
         :root {
             --bg: #f4f8ef;
@@ -543,6 +545,259 @@
             align-items: center;
         }
 
+        .map-shell {
+            margin-top: 24px;
+            border-radius: 30px;
+            padding: 14px;
+            border: 1px solid rgba(19, 33, 22, 0.12);
+            background: linear-gradient(180deg, #f9fcf8 0%, #f1f7f2 100%);
+            box-shadow: 0 18px 36px rgba(12, 34, 21, 0.1);
+        }
+
+        .map-toolbar {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .map-search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(19, 33, 22, 0.14);
+            background: white;
+            padding: 0 12px;
+        }
+
+        .map-search svg {
+            flex-shrink: 0;
+            color: #58705e;
+        }
+
+        .map-search input {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            font: inherit;
+            color: var(--ink);
+            padding: 14px 0;
+        }
+
+        .map-search input:focus {
+            outline: none;
+        }
+
+        .map-action {
+            white-space: nowrap;
+            padding-inline: 16px;
+        }
+
+        .farm-map {
+            width: 100%;
+            height: 500px;
+            border-radius: 22px;
+            overflow: hidden;
+            border: 1px solid rgba(19, 33, 22, 0.16);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+        }
+
+        .map-sheet {
+            margin-top: 10px;
+            border-radius: 22px;
+            background: #ffffff;
+            border: 1px solid rgba(19, 33, 22, 0.11);
+            padding: 16px;
+        }
+
+        .map-sheet-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .map-sheet-head h3 {
+            margin: 0;
+            font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+            line-height: 1.16;
+        }
+
+        .map-sheet-head p {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .device-counter {
+            border-radius: 14px;
+            background: #edf8f0;
+            color: #1f6f3d;
+            font-weight: 800;
+            padding: 10px 14px;
+            white-space: nowrap;
+        }
+
+        .device-counter span {
+            font-size: 1.35rem;
+            margin-right: 4px;
+        }
+
+        .status-badges {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .status-chip {
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-weight: 800;
+            font-size: 0.85rem;
+        }
+
+        .status-chip.low {
+            background: #fff3e4;
+            color: #8d560f;
+        }
+
+        .status-chip.normal {
+            background: #e9f8ee;
+            color: #1c7340;
+        }
+
+        .status-chip.high {
+            background: #ffedeb;
+            color: #9a3528;
+        }
+
+        .device-list {
+            margin-top: 14px;
+            display: grid;
+            gap: 10px;
+            max-height: 320px;
+            overflow: auto;
+            padding-right: 4px;
+        }
+
+        .device-row {
+            border-radius: 16px;
+            border: 1px solid rgba(19, 33, 22, 0.11);
+            background: #fdfefd;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .device-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .device-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .device-icon.low {
+            background: #d79924;
+        }
+
+        .device-icon.normal {
+            background: #23a154;
+        }
+
+        .device-icon.high {
+            background: #cf4a3c;
+        }
+
+        .device-id {
+            margin: 0;
+            font-size: 1.85rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .device-name {
+            margin: 4px 0 0;
+            color: #78857d;
+            font-size: 0.95rem;
+        }
+
+        .device-right {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .device-state {
+            margin: 0;
+            font-weight: 800;
+        }
+
+        .device-state.low {
+            color: #9b6113;
+        }
+
+        .device-state.normal {
+            color: #1f7b43;
+        }
+
+        .device-state.high {
+            color: #b33e32;
+        }
+
+        .device-percent {
+            margin: 2px 0 0;
+            font-size: 1.6rem;
+            line-height: 1.05;
+            font-weight: 900;
+        }
+
+        .device-delta {
+            margin: 3px 0 0;
+            color: #58665f;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .empty-list {
+            margin: 0;
+            border-radius: 14px;
+            background: #f2f7f3;
+            color: #4b5d51;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .sensor-marker {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.14);
+        }
+
+        .leaflet-control-attribution {
+            font-size: 0.65rem;
+        }
+
+        .leaflet-draw-actions a {
+            font-size: 0.85rem;
+        }
+
         .contact-panel {
             background: #0f2116;
             color: #edf6ef;
@@ -750,6 +1005,18 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
+            .map-toolbar {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .map-search {
+                grid-column: 1 / -1;
+            }
+
+            .farm-map {
+                height: 430px;
+            }
+
             .hero-card img {
                 height: 430px;
             }
@@ -784,6 +1051,34 @@
             .hero-card img {
                 height: 360px;
             }
+
+            .map-shell {
+                padding: 10px;
+            }
+
+            .map-toolbar {
+                grid-template-columns: 1fr;
+            }
+
+            .map-action {
+                width: 100%;
+            }
+
+            .farm-map {
+                height: 360px;
+            }
+
+            .device-row {
+                align-items: flex-start;
+            }
+
+            .device-id {
+                font-size: 1.6rem;
+            }
+
+            .device-percent {
+                font-size: 1.35rem;
+            }
         }
     </style>
 </head>
@@ -803,6 +1098,7 @@
                 <a class="nav-link" href="#about">Asbob haqida</a>
                 <a class="nav-link" href="#how">Jarayon</a>
                 <a class="nav-link" href="#monitor">Live indikator</a>
+                <a class="nav-link" href="#farm-map">Fermer xaritasi</a>
                 <a class="nav-link" href="#gallery">Rasmlar</a>
                 <a class="nav-link" href="#contact">Bog'lanish</a>
             </nav>
@@ -818,6 +1114,7 @@
             <a class="nav-link mobile-link" href="#about">Asbob haqida</a>
             <a class="nav-link mobile-link" href="#how">Jarayon</a>
             <a class="nav-link mobile-link" href="#monitor">Live indikator</a>
+            <a class="nav-link mobile-link" href="#farm-map">Fermer xaritasi</a>
             <a class="nav-link mobile-link" href="#gallery">Rasmlar</a>
             <a class="nav-link mobile-link" href="#contact">Bog'lanish</a>
         </div>
@@ -957,6 +1254,63 @@
             </div>
         </section>
 
+        <section id="farm-map" class="section" style="padding-top: 20px">
+            <div class="container">
+                <span class="pill" data-reveal>Fermer xaritasi</span>
+                <h2 class="section-title headline-font" data-reveal style="--delay: 0.08s">
+                    Fermer yerini belgilang va o'sha hududdagi suv nazorat asboblarini ko'ring
+                </h2>
+                <p class="section-desc" data-reveal style="--delay: 0.14s">
+                    Xaritada "Fermer yerini belgilash" tugmasini bosing, maydon chegarasini chizing va tanlangan
+                    hudud ichidagi asboblar holatini me'yoridan kam, normal yoki me'yoridan oshiq ko'rinishida foiz
+                    bilan oling.
+                </p>
+
+                <div class="map-shell" data-reveal style="--delay: 0.2s">
+                    <div class="map-toolbar">
+                        <label class="map-search" for="farmSearch">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle>
+                                <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"></path>
+                            </svg>
+                            <input id="farmSearch" type="text"
+                                placeholder="Hudud qidiring (masalan: Chilonzor, Sergeli, Yunusobod)" />
+                        </label>
+                        <button id="startDrawBtn" class="btn btn-primary map-action" type="button">Fermer yerini
+                            belgilash</button>
+                        <button id="clearFarmBtn" class="btn btn-secondary map-action" type="button">Maydonni
+                            tozalash</button>
+                    </div>
+
+                    <div id="farmMap" class="farm-map" aria-label="Fermer xaritasi" role="region"></div>
+
+                    <article class="map-sheet" aria-live="polite">
+                        <div class="map-sheet-head">
+                            <div>
+                                <h3 class="headline-font">Tanlangan yer: <span
+                                        id="selectedAreaName">Belgilanmagan</span>
+                                </h3>
+                                <p id="mapSummary">Avval yer maydonini belgilang, keyin asboblar ro'yxati shu yerda
+                                    chiqadi.</p>
+                            </div>
+                            <div class="device-counter"><span id="selectedCount">0</span> ta asbob</div>
+                        </div>
+
+                        <div class="status-badges">
+                            <span class="status-chip low">Kam: <strong id="lowCount">0</strong></span>
+                            <span class="status-chip normal">Normal: <strong id="normalCount">0</strong></span>
+                            <span class="status-chip high">Oshiq: <strong id="highCount">0</strong></span>
+                        </div>
+
+                        <div id="deviceList" class="device-list">
+                            <p class="empty-list">Ro'yxat hozircha bo'sh. Xaritada maydon belgilang.</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
         <section id="gallery" class="section" style="padding-top: 20px">
             <div class="container">
                 <span class="pill" data-reveal>Rasmlar</span>
@@ -1049,6 +1403,9 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
     <script>
         const menuBtn = document.getElementById('menuBtn');
         const mobileMenu = document.getElementById('mobileMenu');
@@ -1072,6 +1429,104 @@
 
         const contactForm = document.getElementById('contactForm');
         const formToast = document.getElementById('formToast');
+
+        const farmMapElement = document.getElementById('farmMap');
+        const farmSearch = document.getElementById('farmSearch');
+        const startDrawBtn = document.getElementById('startDrawBtn');
+        const clearFarmBtn = document.getElementById('clearFarmBtn');
+        const selectedAreaName = document.getElementById('selectedAreaName');
+        const mapSummary = document.getElementById('mapSummary');
+        const selectedCount = document.getElementById('selectedCount');
+        const lowCount = document.getElementById('lowCount');
+        const normalCount = document.getElementById('normalCount');
+        const highCount = document.getElementById('highCount');
+        const deviceList = document.getElementById('deviceList');
+
+        const farmSensors = [
+            {
+                code: '94',
+                name: "O'rikzor markazi",
+                lat: 41.28466,
+                lng: 69.20398,
+                moisture: 35,
+                optimalMin: 40,
+                optimalMax: 70
+            },
+            {
+                code: '34',
+                name: 'Chilonzor metro bekati',
+                lat: 41.28588,
+                lng: 69.20512,
+                moisture: 58,
+                optimalMin: 40,
+                optimalMax: 70
+            },
+            {
+                code: '150',
+                name: 'Chilonzor dahasi 25-mavze',
+                lat: 41.28712,
+                lng: 69.2063,
+                moisture: 74,
+                optimalMin: 40,
+                optimalMax: 70
+            },
+            {
+                code: '127',
+                name: 'Chilonzor dahasi 25-mavze',
+                lat: 41.28653,
+                lng: 69.2084,
+                moisture: 63,
+                optimalMin: 40,
+                optimalMax: 70
+            },
+            {
+                code: '118',
+                name: 'Chilonzor buyum bozori',
+                lat: 41.28382,
+                lng: 69.20868,
+                moisture: 33,
+                optimalMin: 40,
+                optimalMax: 70
+            },
+            {
+                code: '98',
+                name: 'Chilonzor buyum bozori',
+                lat: 41.28244,
+                lng: 69.2075,
+                moisture: 82,
+                optimalMin: 40,
+                optimalMax: 70
+            },
+            {
+                code: '92',
+                name: "Qatortol sug'orish yo'li",
+                lat: 41.28321,
+                lng: 69.2017,
+                moisture: 48,
+                optimalMin: 40,
+                optimalMax: 70
+            },
+            {
+                code: '77',
+                name: 'Novza dala cheti',
+                lat: 41.28796,
+                lng: 69.2009,
+                moisture: 69,
+                optimalMin: 40,
+                optimalMax: 70
+            }
+        ];
+
+        const mapSearchTargets = {
+            chilonzor: [41.28555, 69.20544],
+            "chilonzor 9-mavze": [41.2859, 69.2052],
+            "chilonzor 9 mavze": [41.2859, 69.2052],
+            "chilonzor dahasi 9-mavze": [41.2859, 69.2052],
+            sergeli: [41.2247, 69.216],
+            yunusobod: [41.3652, 69.2887],
+            novza: [41.28796, 69.2009],
+            qatortol: [41.28321, 69.2017]
+        };
 
         menuBtn?.addEventListener('click', () => {
             mobileMenu.classList.toggle('open');
@@ -1129,7 +1584,7 @@
 
         counterEls.forEach((counterEl) => counterObserver.observe(counterEl));
 
-        const sections = ['about', 'how', 'monitor', 'gallery', 'contact'].map((id) => document.getElementById(id));
+        const sections = ['about', 'how', 'monitor', 'farm-map', 'gallery', 'contact'].map((id) => document.getElementById(id));
         const sectionObserver = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
@@ -1176,6 +1631,310 @@
         moistureRange?.addEventListener('input', (event) => {
             updateMoistureUI(Number(event.target.value));
         });
+
+        const getSensorStatus = (sensor) => {
+            if (sensor.moisture < sensor.optimalMin) {
+                const delta = sensor.optimalMin - sensor.moisture;
+                return {
+                    tone: 'low',
+                    label: "Meyordan kam",
+                    deltaText: `${delta}% kam`
+                };
+            }
+
+            if (sensor.moisture > sensor.optimalMax) {
+                const delta = sensor.moisture - sensor.optimalMax;
+                return {
+                    tone: 'high',
+                    label: "Meyordan oshiq",
+                    deltaText: `${delta}% oshiq`
+                };
+            }
+
+            return {
+                tone: 'normal',
+                label: 'Normal',
+                deltaText: "Me'yor oralig'ida"
+            };
+        };
+
+        const escapeHTML = (value) =>
+            String(value)
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#39;');
+
+        const renderDeviceList = (sensors) => {
+            if (!selectedCount || !lowCount || !normalCount || !highCount || !deviceList) {
+                return;
+            }
+
+            selectedCount.textContent = String(sensors.length);
+
+            const grouped = sensors.reduce(
+                (acc, sensor) => {
+                    const status = getSensorStatus(sensor);
+                    acc[status.tone] += 1;
+                    return acc;
+                },
+                { low: 0, normal: 0, high: 0 }
+            );
+
+            lowCount.textContent = String(grouped.low);
+            normalCount.textContent = String(grouped.normal);
+            highCount.textContent = String(grouped.high);
+
+            if (!sensors.length) {
+                deviceList.innerHTML = "<p class='empty-list'>Tanlangan hududda asbob topilmadi. Boshqa yer belgilang.</p>";
+                return;
+            }
+
+            deviceList.innerHTML = sensors
+                .map((sensor) => {
+                    const status = getSensorStatus(sensor);
+                    return `
+                        <article class="device-row">
+                            <div class="device-left">
+                                <span class="device-icon ${status.tone}">${escapeHTML(sensor.code)}</span>
+                                <div>
+                                    <p class="device-id">${escapeHTML(sensor.code)}</p>
+                                    <p class="device-name">${escapeHTML(sensor.name)}</p>
+                                </div>
+                            </div>
+                            <div class="device-right">
+                                <p class="device-state ${status.tone}">${status.label}</p>
+                                <p class="device-percent">${sensor.moisture}%</p>
+                                <p class="device-delta">${status.deltaText}</p>
+                            </div>
+                        </article>
+                    `;
+                })
+                .join('');
+        };
+
+        const isPointInPolygon = (point, polygon) => {
+            let inside = false;
+            const x = point.lng;
+            const y = point.lat;
+
+            for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                const xi = polygon[i].lng;
+                const yi = polygon[i].lat;
+                const xj = polygon[j].lng;
+                const yj = polygon[j].lat;
+
+                const intersects =
+                    yi > y !== yj > y &&
+                    x < ((xj - xi) * (y - yi)) / (yj - yi + Number.EPSILON) + xi;
+
+                if (intersects) {
+                    inside = !inside;
+                }
+            }
+
+            return inside;
+        };
+
+        const normalizeSearchText = (value) =>
+            String(value)
+                .toLowerCase()
+                .replace(/['`-]+/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+        const setupFarmMap = () => {
+            if (!farmMapElement || !window.L || !mapSummary || !selectedAreaName || !farmSearch) {
+                return;
+            }
+
+            const map = L.map(farmMapElement, {
+                zoomControl: false,
+                scrollWheelZoom: true
+            }).setView([41.28555, 69.20544], 15);
+
+            L.control.zoom({ position: 'right' }).addTo(map);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            const parcelLayer = L.featureGroup().addTo(map);
+
+            const drawControl = new L.Control.Draw({
+                position: 'topright',
+                draw: false,
+                edit: {
+                    featureGroup: parcelLayer,
+                    remove: false
+                }
+            });
+
+            map.addControl(drawControl);
+
+            const toneColors = {
+                low: '#d79924',
+                normal: '#23a154',
+                high: '#cf4a3c'
+            };
+
+            const highlightSensorMarkers = (sensors = null) => {
+                const activeCodes = sensors ? new Set(sensors.map((sensor) => sensor.code)) : null;
+
+                farmSensors.forEach((sensor) => {
+                    if (!sensor.marker) {
+                        return;
+                    }
+
+                    const active = !activeCodes || activeCodes.has(sensor.code);
+                    sensor.marker.setStyle({
+                        fillOpacity: active ? 0.92 : 0.2,
+                        opacity: active ? 1 : 0.3,
+                        radius: active ? 8.5 : 6.5
+                    });
+                });
+            };
+
+            farmSensors.forEach((sensor) => {
+                const status = getSensorStatus(sensor);
+
+                const marker = L.circleMarker([sensor.lat, sensor.lng], {
+                    radius: 8.5,
+                    color: '#ffffff',
+                    weight: 2,
+                    fillColor: toneColors[status.tone],
+                    fillOpacity: 0.92
+                }).addTo(map);
+
+                marker.bindPopup(
+                    `<strong>Asbob ${escapeHTML(sensor.code)}</strong><br>${escapeHTML(sensor.name)}<br>${status.label}: <strong>${sensor.moisture}%</strong>`
+                );
+
+                sensor.marker = marker;
+            });
+
+            const polygonOptions = {
+                allowIntersection: false,
+                showArea: true,
+                shapeOptions: {
+                    color: '#2d8f4e',
+                    fillColor: '#2d8f4e',
+                    fillOpacity: 0.16,
+                    weight: 3
+                }
+            };
+
+            const readPolygonLatLngs = (layer) => {
+                const raw = layer.getLatLngs();
+                return Array.isArray(raw[0]) ? raw[0] : raw;
+            };
+
+            const summarizeSelection = (polygonLatLngs) => {
+                const selectedSensors = farmSensors.filter((sensor) =>
+                    isPointInPolygon({ lat: sensor.lat, lng: sensor.lng }, polygonLatLngs)
+                );
+
+                const areaSqm = L.GeometryUtil?.geodesicArea ? L.GeometryUtil.geodesicArea(polygonLatLngs) : 0;
+                const areaHectare = areaSqm / 10000;
+
+                const averageMoisture = selectedSensors.length
+                    ? Math.round(selectedSensors.reduce((sum, sensor) => sum + sensor.moisture, 0) / selectedSensors.length)
+                    : 0;
+
+                selectedAreaName.textContent = farmSearch.value.trim() || 'Fermer maydoni';
+
+                if (selectedSensors.length) {
+                    mapSummary.textContent = `Maydon hajmi ${areaHectare.toFixed(2)} ga. O'rtacha namlik ${averageMoisture}% bo'ldi.`;
+                } else {
+                    mapSummary.textContent = `Maydon hajmi ${areaHectare.toFixed(2)} ga. Bu hududda asbob aniqlanmadi.`;
+                }
+
+                renderDeviceList(selectedSensors);
+                highlightSensorMarkers(selectedSensors);
+            };
+
+            const resetSelection = () => {
+                if (farmSearch) {
+                    farmSearch.value = '';
+                }
+
+                selectedAreaName.textContent = 'Belgilanmagan';
+                mapSummary.textContent = "Avval yer maydonini belgilang, keyin asboblar ro'yxati shu yerda chiqadi.";
+
+                if (deviceList) {
+                    deviceList.innerHTML = "<p class='empty-list'>Ro'yxat hozircha bo'sh. Xaritada maydon belgilang.</p>";
+                }
+
+                if (selectedCount) {
+                    selectedCount.textContent = '0';
+                }
+
+                if (lowCount) {
+                    lowCount.textContent = '0';
+                }
+
+                if (normalCount) {
+                    normalCount.textContent = '0';
+                }
+
+                if (highCount) {
+                    highCount.textContent = '0';
+                }
+
+                highlightSensorMarkers(null);
+            };
+
+            map.on(L.Draw.Event.CREATED, (event) => {
+                parcelLayer.clearLayers();
+                parcelLayer.addLayer(event.layer);
+                summarizeSelection(readPolygonLatLngs(event.layer));
+            });
+
+            map.on(L.Draw.Event.EDITED, (event) => {
+                event.layers.eachLayer((layer) => {
+                    summarizeSelection(readPolygonLatLngs(layer));
+                });
+            });
+
+            startDrawBtn?.addEventListener('click', () => {
+                const drawHandler = new L.Draw.Polygon(map, polygonOptions);
+                drawHandler.enable();
+            });
+
+            clearFarmBtn?.addEventListener('click', () => {
+                parcelLayer.clearLayers();
+                resetSelection();
+            });
+
+            farmSearch?.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter') {
+                    return;
+                }
+
+                event.preventDefault();
+                const query = normalizeSearchText(farmSearch.value);
+
+                if (!query) {
+                    return;
+                }
+
+                const match = Object.entries(mapSearchTargets).find(([target]) => normalizeSearchText(target).includes(query));
+
+                if (match) {
+                    map.flyTo(match[1], 16, { duration: 0.9 });
+                    selectedAreaName.textContent = farmSearch.value.trim();
+                    return;
+                }
+
+                mapSummary.textContent = "Hudud topilmadi. Masalan: Chilonzor, Novza yoki Qatortol deb kiriting.";
+            });
+
+            resetSelection();
+        };
+
+        setupFarmMap();
 
         const galleryData = Array.from(galleryItems).map((item) => {
             const image = item.querySelector('img');
