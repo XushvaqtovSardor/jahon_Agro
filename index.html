@@ -522,9 +522,9 @@
 
         .gallery-item img {
             width: 100%;
-            height: 360px;
+            height: 410px;
             object-fit: cover;
-            object-position: top center;
+            object-position: center 62%;
             transition: transform 0.35s ease;
         }
 
@@ -814,6 +814,7 @@
             display: grid;
             place-items: center;
             font-weight: 800;
+            font-size: 0.84rem;
             color: white;
             flex-shrink: 0;
         }
@@ -832,9 +833,10 @@
 
         .device-id {
             margin: 0;
-            font-size: 1.85rem;
+            font-size: 1.04rem;
             font-weight: 900;
-            line-height: 1;
+            line-height: 1.18;
+            letter-spacing: 0.02em;
         }
 
         .device-name {
@@ -1190,6 +1192,11 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
+            .gallery-item img {
+                height: 370px;
+                object-position: center 58%;
+            }
+
             .map-toolbar {
                 grid-template-columns: 1fr 1fr 1fr;
             }
@@ -1244,6 +1251,11 @@
                 grid-template-columns: 1fr;
             }
 
+            .gallery-item img {
+                height: 340px;
+                object-position: center 56%;
+            }
+
             .hero {
                 padding-top: 36px;
             }
@@ -1295,7 +1307,7 @@
             }
 
             .device-id {
-                font-size: 1.6rem;
+                font-size: 0.96rem;
             }
 
             .device-percent {
@@ -1952,6 +1964,16 @@
                 .replaceAll('"', '&quot;')
                 .replaceAll("'", '&#39;');
 
+        const formatDeviceName = (name, fallbackCode = '') => {
+            const normalizedName = String(name || '').trim().toLocaleUpperCase('uz-UZ');
+            if (normalizedName) {
+                return normalizedName;
+            }
+
+            const normalizedCode = String(fallbackCode || '').trim();
+            return normalizedCode ? `QURILMA ${normalizedCode}` : 'QURILMA';
+        };
+
         const getSensorKey = (sensor) => String(sensor?.id || sensor?.code || '').trim();
 
         let selectedDeviceKey = '';
@@ -2009,10 +2031,11 @@
             }
 
             deviceList.innerHTML = sensors
-                .map((sensor, index) => {
+                .map((sensor) => {
                     const status = getSensorStatus(sensor);
                     const sensorKey = getSensorKey(sensor);
                     const isSelected = selectedDeviceKey && sensorKey === selectedDeviceKey;
+                    const displayName = formatDeviceName(sensor.name, sensor.code);
                     const sourceLabel = sensor.source === 'auto'
                         ? 'Auto lokatsiya'
                         : sensor.source === 'manual'
@@ -2021,10 +2044,10 @@
                     return `
                         <article class="device-row${isSelected ? ' is-selected' : ''}" data-device-key="${escapeHTML(sensorKey)}" tabindex="0" role="button" aria-pressed="${isSelected ? 'true' : 'false'}">
                             <div class="device-left">
-                                <span class="device-icon ${status.tone}">${index + 1}</span>
+                                <span class="device-icon ${status.tone}">${escapeHTML(sensor.code)}</span>
                                 <div>
-                                    <p class="device-id">Qurilma ${index + 1}</p>
-                                    <p class="device-name">ID: ${escapeHTML(sensor.code)} · ${escapeHTML(sensor.name)}${sourceLabel ? ` · ${sourceLabel}` : ''}</p>
+                                    <p class="device-id">${escapeHTML(displayName)}</p>
+                                    <p class="device-name">ID: ${escapeHTML(sensor.code)}${sourceLabel ? ` · ${sourceLabel}` : ''}</p>
                                 </div>
                             </div>
                             <div class="device-right">
@@ -2076,10 +2099,11 @@
             const listHTML = sensors
                 .map((sensor) => {
                     const status = getSensorStatus(sensor);
+                    const displayName = formatDeviceName(sensor.name, sensor.code);
                     return `
                         <li class="area-popup-item">
                             <div class="area-popup-top">
-                                <span>${escapeHTML(sensor.code)} · ${escapeHTML(sensor.name)}</span>
+                                <span>${escapeHTML(sensor.code)} · ${escapeHTML(displayName)}</span>
                                 <span class="area-popup-state ${status.tone}">${status.label}</span>
                             </div>
                             <div class="area-popup-bottom">Namlik: ${sensor.moisture}%</div>
@@ -2319,6 +2343,7 @@
                 activeManualSensors.forEach((sensor) => {
                     const status = getSensorStatus(sensor);
                     const strokeColor = sensor.source === 'auto' ? '#1f68dd' : '#1a8f72';
+                    const displayName = formatDeviceName(sensor.name, sensor.code);
 
                     const marker = L.circleMarker([sensor.lat, sensor.lng], {
                         radius: 9,
@@ -2329,7 +2354,7 @@
                     }).addTo(manualSensorLayer);
 
                     marker.bindPopup(
-                        `<strong>Qurilma ${escapeHTML(sensor.code)}</strong><br>${escapeHTML(sensor.name)}<br>${sensor.source === 'auto' ? 'Auto lokatsiya' : "Qo'lda belgilangan"}<br>${status.label}: <strong>${sensor.moisture}%</strong>`
+                        `<strong>${escapeHTML(displayName)}</strong><br>ID: ${escapeHTML(sensor.code)}<br>${sensor.source === 'auto' ? 'Auto lokatsiya' : "Qo'lda belgilangan"}<br>${status.label}: <strong>${sensor.moisture}%</strong>`
                     );
 
                     marker.on('click', (event) => {
@@ -2485,11 +2510,12 @@
                     : source === 'auto'
                         ? `Auto aniqlangan qurilma ${nextCode}`
                         : `Qo'lda belgilangan qurilma ${nextCode}`;
+                const normalizedDeviceName = formatDeviceName(deviceName, nextCode);
 
                 activeManualSensors.push({
                     id: `manual-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
                     code: nextCode,
-                    name: deviceName,
+                    name: normalizedDeviceName,
                     lat: point.lat,
                     lng: point.lng,
                     moisture: clampMoisture(moistureInput),
@@ -2504,14 +2530,15 @@
                 syncActiveFarmManualSensors();
 
                 mapSummary.textContent = source === 'auto'
-                    ? `${nextCode} qurilma auto lokatsiya orqali qo'shildi.`
-                    : `${nextCode} qurilma qo'lda joylashtirildi.`;
+                    ? `${normalizedDeviceName} auto lokatsiya orqali qo'shildi.`
+                    : `${normalizedDeviceName} qo'lda joylashtirildi.`;
 
                 return true;
             };
 
             farmSensors.forEach((sensor) => {
                 const status = getSensorStatus(sensor);
+                const displayName = formatDeviceName(sensor.name, sensor.code);
 
                 const marker = L.circleMarker([sensor.lat, sensor.lng], {
                     radius: 8.5,
@@ -2522,7 +2549,7 @@
                 }).addTo(map);
 
                 marker.bindPopup(
-                    `<strong>Qurilma ${escapeHTML(sensor.code)}</strong><br>${escapeHTML(sensor.name)}<br>${status.label}: <strong>${sensor.moisture}%</strong>`
+                    `<strong>${escapeHTML(displayName)}</strong><br>ID: ${escapeHTML(sensor.code)}<br>${status.label}: <strong>${sensor.moisture}%</strong>`
                 );
 
                 marker.on('click', (event) => {
@@ -2610,7 +2637,8 @@
 
                 selectDeviceInListUI(normalizedKey);
                 highlightSensorMarkers(selectedSensors);
-                mapSummary.textContent = `${sensor.code} qurilma tanlandi: ${sensor.name} (${sensor.moisture}% namlik).`;
+                const displayName = formatDeviceName(sensor.name, sensor.code);
+                mapSummary.textContent = `${displayName} tanlandi (${sensor.moisture}% namlik).`;
 
                 const selectedRow = Array.from(deviceList?.querySelectorAll('.device-row[data-device-key]') || [])
                     .find((row) => row.dataset.deviceKey === normalizedKey);
