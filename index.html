@@ -568,6 +568,17 @@
             box-shadow: 0 18px 36px rgba(12, 34, 21, 0.1);
         }
 
+        .map-main-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr);
+            gap: 12px;
+            align-items: start;
+        }
+
+        .map-canvas-col {
+            min-width: 0;
+        }
+
         .map-toolbar {
             display: grid;
             grid-template-columns: 1fr auto auto auto;
@@ -624,7 +635,7 @@
 
         .farm-map {
             width: 100%;
-            height: 500px;
+            height: 560px;
             border-radius: 22px;
             overflow: hidden;
             border: 1px solid rgba(19, 33, 22, 0.16);
@@ -632,11 +643,13 @@
         }
 
         .map-sheet {
-            margin-top: 10px;
             border-radius: 22px;
             background: #ffffff;
             border: 1px solid rgba(19, 33, 22, 0.11);
             padding: 16px;
+            align-self: start;
+            position: sticky;
+            top: 92px;
         }
 
         .map-sheet-head {
@@ -765,6 +778,26 @@
             align-items: center;
             justify-content: space-between;
             gap: 14px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .device-row:hover {
+            border-color: rgba(35, 111, 61, 0.34);
+            box-shadow: 0 10px 18px rgba(20, 51, 32, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .device-row:focus-visible {
+            outline: none;
+            border-color: #2b8f4f;
+            box-shadow: 0 0 0 4px rgba(43, 143, 79, 0.18);
+        }
+
+        .device-row.is-selected {
+            border-color: rgba(35, 111, 61, 0.56);
+            background: #eef8f1;
+            box-shadow: 0 0 0 3px rgba(35, 111, 61, 0.13);
         }
 
         .device-left {
@@ -844,6 +877,15 @@
             color: #58665f;
             font-size: 0.82rem;
             font-weight: 700;
+        }
+
+        .device-pick {
+            margin: 5px 0 0;
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: #1f6f3d;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
         }
 
         .empty-list {
@@ -1169,8 +1211,16 @@
                 grid-template-columns: 1fr 1fr;
             }
 
+            .map-main-layout {
+                grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+            }
+
             .farm-map {
                 height: 430px;
+            }
+
+            .map-sheet {
+                position: static;
             }
 
             .hero-card img {
@@ -1213,6 +1263,10 @@
             }
 
             .map-toolbar {
+                grid-template-columns: 1fr;
+            }
+
+            .map-main-layout {
                 grid-template-columns: 1fr;
             }
 
@@ -1464,46 +1518,51 @@
                     <p id="devicePlaceHint" class="map-hint">Yer ichida qurilma qo'shish uchun avval maydonni
                         belgilang.</p>
 
-                    <div id="farmMap" class="farm-map" aria-label="Fermer xaritasi" role="region"></div>
+                    <div class="map-main-layout">
+                        <div class="map-canvas-col">
+                            <div id="farmMap" class="farm-map" aria-label="Fermer xaritasi" role="region"></div>
+                        </div>
 
-                    <article class="map-sheet" aria-live="polite">
-                        <div class="map-sheet-head">
-                            <div>
-                                <h3 class="headline-font">Tanlangan yer: <span
-                                        id="selectedAreaName">Belgilanmagan</span>
-                                </h3>
-                                <p id="mapSummary">Avval yer maydonini belgilang, keyin qurilmalar ro'yxati shu yerda
-                                    chiqadi.</p>
+                        <article class="map-sheet" aria-live="polite">
+                            <div class="map-sheet-head">
+                                <div>
+                                    <h3 class="headline-font">Tanlangan yer: <span
+                                            id="selectedAreaName">Belgilanmagan</span>
+                                    </h3>
+                                    <p id="mapSummary">Avval yer maydonini belgilang, keyin qurilmalar ro'yxati shu
+                                        yerda
+                                        chiqadi.</p>
+                                </div>
+                                <div class="device-counter"><span id="selectedCount">0</span> ta qurilma</div>
                             </div>
-                            <div class="device-counter"><span id="selectedCount">0</span> ta qurilma</div>
-                        </div>
 
-                        <div class="status-badges">
-                            <span class="status-chip low">Kam: <strong id="lowCount">0</strong></span>
-                            <span class="status-chip normal">Normal: <strong id="normalCount">0</strong></span>
-                            <span class="status-chip high">Oshiq: <strong id="highCount">0</strong></span>
-                        </div>
-
-                        <div class="saved-farms">
-                            <label for="savedFarmsSelect">Saqlangan fermer yerlar</label>
-                            <div class="saved-row">
-                                <select id="savedFarmsSelect" class="saved-select"
-                                    aria-label="Saqlangan yerlar ro'yxati">
-                                    <option value="">Saqlangan yer yo'q</option>
-                                </select>
-                                <button id="loadFarmBtn" class="btn btn-secondary map-mini-btn"
-                                    type="button">Yuklash</button>
-                                <button id="deleteFarmBtn" class="btn btn-secondary map-mini-btn"
-                                    type="button">O'chirish</button>
+                            <div class="status-badges">
+                                <span class="status-chip low">Kam: <strong id="lowCount">0</strong></span>
+                                <span class="status-chip normal">Normal: <strong id="normalCount">0</strong></span>
+                                <span class="status-chip high">Oshiq: <strong id="highCount">0</strong></span>
                             </div>
-                            <p class="map-hint">Yer chizilgach "Yerni saqlash" tugmasi orqali keyingi kirishda ham
-                                saqlanib qoladi.</p>
-                        </div>
 
-                        <div id="deviceList" class="device-list">
-                            <p class="empty-list">Ro'yxat hozircha bo'sh. Xaritada maydon belgilang.</p>
-                        </div>
-                    </article>
+                            <div class="saved-farms">
+                                <label for="savedFarmsSelect">Saqlangan fermer yerlar</label>
+                                <div class="saved-row">
+                                    <select id="savedFarmsSelect" class="saved-select"
+                                        aria-label="Saqlangan yerlar ro'yxati">
+                                        <option value="">Saqlangan yer yo'q</option>
+                                    </select>
+                                    <button id="loadFarmBtn" class="btn btn-secondary map-mini-btn"
+                                        type="button">Yuklash</button>
+                                    <button id="deleteFarmBtn" class="btn btn-secondary map-mini-btn"
+                                        type="button">O'chirish</button>
+                                </div>
+                                <p class="map-hint">Yer chizilgach "Yerni saqlash" tugmasi orqali keyingi kirishda ham
+                                    saqlanib qoladi.</p>
+                            </div>
+
+                            <div id="deviceList" class="device-list">
+                                <p class="empty-list">Ro'yxat hozircha bo'sh. Xaritada maydon belgilang.</p>
+                            </div>
+                        </article>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1893,9 +1952,39 @@
                 .replaceAll('"', '&quot;')
                 .replaceAll("'", '&#39;');
 
+        const getSensorKey = (sensor) => String(sensor?.id || sensor?.code || '').trim();
+
+        let selectedDeviceKey = '';
+        let renderedDeviceSensors = [];
+        let onDeviceRowSelect = null;
+
+        const updateDeviceRowSelectionState = () => {
+            if (!deviceList) {
+                return;
+            }
+
+            const rows = deviceList.querySelectorAll('.device-row[data-device-key]');
+            rows.forEach((row) => {
+                const isSelected = !!selectedDeviceKey && row.dataset.deviceKey === selectedDeviceKey;
+                row.classList.toggle('is-selected', isSelected);
+                row.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+            });
+        };
+
+        const selectDeviceInListUI = (deviceKey) => {
+            selectedDeviceKey = String(deviceKey || '').trim();
+            updateDeviceRowSelectionState();
+        };
+
         const renderDeviceList = (sensors) => {
             if (!selectedCount || !lowCount || !normalCount || !highCount || !deviceList) {
                 return;
+            }
+
+            renderedDeviceSensors = Array.isArray(sensors) ? sensors : [];
+
+            if (selectedDeviceKey && !renderedDeviceSensors.some((sensor) => getSensorKey(sensor) === selectedDeviceKey)) {
+                selectedDeviceKey = '';
             }
 
             selectedCount.textContent = String(sensors.length);
@@ -1915,36 +2004,69 @@
 
             if (!sensors.length) {
                 deviceList.innerHTML = "<p class='empty-list'>Tanlangan hududda qurilma topilmadi. Boshqa yer belgilang.</p>";
+                selectedDeviceKey = '';
                 return;
             }
 
             deviceList.innerHTML = sensors
-                .map((sensor) => {
+                .map((sensor, index) => {
                     const status = getSensorStatus(sensor);
+                    const sensorKey = getSensorKey(sensor);
+                    const isSelected = selectedDeviceKey && sensorKey === selectedDeviceKey;
                     const sourceLabel = sensor.source === 'auto'
                         ? 'Auto lokatsiya'
                         : sensor.source === 'manual'
                             ? "Qo'lda belgilangan"
                             : '';
                     return `
-                        <article class="device-row">
+                        <article class="device-row${isSelected ? ' is-selected' : ''}" data-device-key="${escapeHTML(sensorKey)}" tabindex="0" role="button" aria-pressed="${isSelected ? 'true' : 'false'}">
                             <div class="device-left">
-                                <span class="device-icon ${status.tone}">${escapeHTML(sensor.code)}</span>
+                                <span class="device-icon ${status.tone}">${index + 1}</span>
                                 <div>
-                                    <p class="device-id">${escapeHTML(sensor.code)}</p>
-                                    <p class="device-name">${escapeHTML(sensor.name)}${sourceLabel ? ` · ${sourceLabel}` : ''}</p>
+                                    <p class="device-id">Qurilma ${index + 1}</p>
+                                    <p class="device-name">ID: ${escapeHTML(sensor.code)} · ${escapeHTML(sensor.name)}${sourceLabel ? ` · ${sourceLabel}` : ''}</p>
                                 </div>
                             </div>
                             <div class="device-right">
                                 <p class="device-state ${status.tone}">${status.label}</p>
                                 <p class="device-percent">${sensor.moisture}%</p>
                                 <p class="device-delta">${status.deltaText}</p>
+                                <p class="device-pick">${isSelected ? 'Tanlangan' : 'Tanlash'}</p>
                             </div>
                         </article>
                     `;
                 })
                 .join('');
+
+            updateDeviceRowSelectionState();
         };
+
+        deviceList?.addEventListener('click', (event) => {
+            const row = event.target.closest('.device-row[data-device-key]');
+            if (!row) {
+                return;
+            }
+
+            const sensorKey = row.dataset.deviceKey || '';
+            selectDeviceInListUI(sensorKey);
+            onDeviceRowSelect?.(sensorKey, { source: 'list' });
+        });
+
+        deviceList?.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') {
+                return;
+            }
+
+            const row = event.target.closest('.device-row[data-device-key]');
+            if (!row) {
+                return;
+            }
+
+            event.preventDefault();
+            const sensorKey = row.dataset.deviceKey || '';
+            selectDeviceInListUI(sensorKey);
+            onDeviceRowSelect?.(sensorKey, { source: 'list' });
+        });
 
         const buildAreaDevicesPopupHTML = (sensors) => {
             if (!sensors.length) {
@@ -2053,6 +2175,7 @@
             let activeManualSensors = [];
             let isDeviceDropMode = false;
             let manualSensorSequence = 1;
+            let syncDeviceSelection = () => { };
 
             const toneColors = {
                 low: '#d79924',
@@ -2209,24 +2332,41 @@
                         `<strong>Qurilma ${escapeHTML(sensor.code)}</strong><br>${escapeHTML(sensor.name)}<br>${sensor.source === 'auto' ? 'Auto lokatsiya' : "Qo'lda belgilangan"}<br>${status.label}: <strong>${sensor.moisture}%</strong>`
                     );
 
+                    marker.on('click', (event) => {
+                        if (event?.originalEvent) {
+                            L.DomEvent.stopPropagation(event.originalEvent);
+                        }
+
+                        syncDeviceSelection(getSensorKey(sensor), 'map');
+                    });
+
                     sensor.marker = marker;
                 });
             };
 
             const highlightSensorMarkers = (sensors = null) => {
-                const activeCodes = sensors ? new Set(sensors.map((sensor) => sensor.code)) : null;
+                const activeKeys = sensors ? new Set(sensors.map((sensor) => getSensorKey(sensor))) : null;
 
                 farmSensors.forEach((sensor) => {
                     if (!sensor.marker) {
                         return;
                     }
 
-                    const active = !activeCodes || activeCodes.has(sensor.code);
+                    const sensorKey = getSensorKey(sensor);
+                    const active = !activeKeys || activeKeys.has(sensorKey);
+                    const isSelected = !!selectedDeviceKey && sensorKey === selectedDeviceKey;
+
                     sensor.marker.setStyle({
                         fillOpacity: active ? 0.92 : 0.2,
                         opacity: active ? 1 : 0.3,
-                        radius: active ? 8.5 : 6.5
+                        radius: isSelected ? 10.5 : active ? 8.5 : 6.5,
+                        color: isSelected ? '#0c2c1a' : '#ffffff',
+                        weight: isSelected ? 3 : 2
                     });
+
+                    if (isSelected) {
+                        sensor.marker.bringToFront();
+                    }
                 });
 
                 activeManualSensors.forEach((sensor) => {
@@ -2234,12 +2374,22 @@
                         return;
                     }
 
-                    const active = !activeCodes || activeCodes.has(sensor.code);
+                    const sensorKey = getSensorKey(sensor);
+                    const active = !activeKeys || activeKeys.has(sensorKey);
+                    const isSelected = !!selectedDeviceKey && sensorKey === selectedDeviceKey;
+                    const strokeColor = sensor.source === 'auto' ? '#1f68dd' : '#1a8f72';
+
                     sensor.marker.setStyle({
                         fillOpacity: active ? 0.95 : 0.28,
                         opacity: active ? 1 : 0.35,
-                        radius: active ? 9 : 7
+                        radius: isSelected ? 11 : active ? 9 : 7,
+                        color: isSelected ? '#0c2c1a' : strokeColor,
+                        weight: isSelected ? 3 : 2
                     });
+
+                    if (isSelected) {
+                        sensor.marker.bringToFront();
+                    }
                 });
             };
 
@@ -2375,6 +2525,14 @@
                     `<strong>Qurilma ${escapeHTML(sensor.code)}</strong><br>${escapeHTML(sensor.name)}<br>${status.label}: <strong>${sensor.moisture}%</strong>`
                 );
 
+                marker.on('click', (event) => {
+                    if (event?.originalEvent) {
+                        L.DomEvent.stopPropagation(event.originalEvent);
+                    }
+
+                    syncDeviceSelection(getSensorKey(sensor), 'map');
+                });
+
                 sensor.marker = marker;
             });
 
@@ -2414,6 +2572,60 @@
                 return [...baseSensors, ...manualSensors];
             };
 
+            const findSensorByKey = (deviceKey) => {
+                const normalizedKey = String(deviceKey || '').trim();
+
+                if (!normalizedKey) {
+                    return null;
+                }
+
+                return [...farmSensors, ...activeManualSensors].find((sensor) => getSensorKey(sensor) === normalizedKey) || null;
+            };
+
+            syncDeviceSelection = (deviceKey, source = 'list') => {
+                const normalizedKey = String(deviceKey || '').trim();
+                if (!normalizedKey) {
+                    return;
+                }
+
+                if (activePolygonLatLngs.length < 3) {
+                    mapSummary.textContent = "Avval maydon belgilang, keyin qurilmani tanlang.";
+                    return;
+                }
+
+                const selectedSensors = selectedSensorsFromPolygon(activePolygonLatLngs);
+                renderDeviceList(selectedSensors);
+
+                if (!selectedSensors.some((sensor) => getSensorKey(sensor) === normalizedKey)) {
+                    selectDeviceInListUI('');
+                    highlightSensorMarkers(selectedSensors);
+                    mapSummary.textContent = "Bu qurilma tanlangan yer hududiga kirmaydi.";
+                    return;
+                }
+
+                const sensor = findSensorByKey(normalizedKey);
+                if (!sensor) {
+                    return;
+                }
+
+                selectDeviceInListUI(normalizedKey);
+                highlightSensorMarkers(selectedSensors);
+                mapSummary.textContent = `${sensor.code} qurilma tanlandi: ${sensor.name} (${sensor.moisture}% namlik).`;
+
+                const selectedRow = Array.from(deviceList?.querySelectorAll('.device-row[data-device-key]') || [])
+                    .find((row) => row.dataset.deviceKey === normalizedKey);
+                selectedRow?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+                if (source === 'list') {
+                    map.flyTo([sensor.lat, sensor.lng], Math.max(map.getZoom(), 16), { duration: 0.7 });
+                    sensor.marker?.openPopup();
+                }
+            };
+
+            onDeviceRowSelect = (deviceKey, meta = {}) => {
+                syncDeviceSelection(deviceKey, meta.source || 'list');
+            };
+
             const showAreaDevicesListAtPoint = (latlng) => {
                 if (!latlng || activePolygonLatLngs.length < 3) {
                     return;
@@ -2443,6 +2655,23 @@
                     .openOn(map);
 
                 deviceList?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            };
+
+            const handleAreaSurfaceClick = (nativeEvent) => {
+                if (drawHandler && typeof drawHandler.enabled === 'function' && drawHandler.enabled()) {
+                    return;
+                }
+
+                if (isDeviceDropMode || activePolygonLatLngs.length < 3) {
+                    return;
+                }
+
+                const clickedLatLng = map.mouseEventToLatLng(nativeEvent);
+                const clickedPoint = { lat: clickedLatLng.lat, lng: clickedLatLng.lng };
+
+                if (isPointInPolygon(clickedPoint, activePolygonLatLngs)) {
+                    showAreaDevicesListAtPoint(clickedLatLng);
+                }
             };
 
             const summarizeSelection = (polygonLatLngs) => {
@@ -2515,6 +2744,9 @@
 
                 selectedAreaName.textContent = 'Belgilanmagan';
                 mapSummary.textContent = "Avval yer maydonini belgilang, keyin qurilmalar ro'yxati shu yerda chiqadi.";
+                selectDeviceInListUI('');
+                renderedDeviceSensors = [];
+                map.closePopup();
 
                 if (deviceList) {
                     deviceList.innerHTML = "<p class='empty-list'>Ro'yxat hozircha bo'sh. Xaritada maydon belgilang.</p>";
@@ -2663,12 +2895,6 @@
                 }
 
                 if (!isDeviceDropMode) {
-                    if (activePolygonLatLngs.length >= 3) {
-                        const point = { lat: event.latlng.lat, lng: event.latlng.lng };
-                        if (isPointInPolygon(point, activePolygonLatLngs)) {
-                            showAreaDevicesListAtPoint(event.latlng);
-                        }
-                    }
                     return;
                 }
 
@@ -2827,6 +3053,7 @@
 
             mapVisibilityObserver.observe(farmMapElement);
             window.addEventListener('resize', onMapResize);
+            map.getContainer().addEventListener('click', handleAreaSurfaceClick);
             setTimeout(onMapResize, 230);
         };
 
