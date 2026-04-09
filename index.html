@@ -253,6 +253,18 @@
             transform: translateY(-2px);
         }
 
+        .btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            filter: grayscale(0.12);
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+        }
+
         .btn-primary {
             color: white;
             background: linear-gradient(135deg, var(--primary), #40b869);
@@ -865,6 +877,70 @@
             color: #55665b;
         }
 
+        .area-devices-popup .leaflet-popup-content {
+            margin: 10px 12px;
+            min-width: 250px;
+            max-height: 230px;
+            overflow: auto;
+        }
+
+        .area-popup-title {
+            margin: 0 0 8px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #1f2f25;
+        }
+
+        .area-popup-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 6px;
+        }
+
+        .area-popup-item {
+            border-radius: 10px;
+            border: 1px solid rgba(19, 33, 22, 0.12);
+            background: #f7fbf8;
+            padding: 6px 8px;
+        }
+
+        .area-popup-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 0.86rem;
+            font-weight: 700;
+        }
+
+        .area-popup-bottom {
+            margin-top: 2px;
+            font-size: 0.81rem;
+            color: #5b6861;
+            font-weight: 600;
+        }
+
+        .area-popup-state.low {
+            color: #9b6113;
+        }
+
+        .area-popup-state.normal {
+            color: #1f7b43;
+        }
+
+        .area-popup-state.high {
+            color: #b33e32;
+        }
+
+        .area-popup-empty {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #5f6963;
+            font-weight: 600;
+        }
+
         .contact-panel {
             background: #0f2116;
             color: #edf6ef;
@@ -1187,7 +1263,7 @@
             </a>
 
             <nav class="nav-links">
-                <a class="nav-link" href="#about">Asbob haqida</a>
+                <a class="nav-link" href="#about">Qurilma haqida</a>
                 <a class="nav-link" href="#how">Jarayon</a>
                 <a class="nav-link" href="#monitor">Live indikator</a>
                 <a class="nav-link" href="#farm-map">Fermer xaritasi</a>
@@ -1203,7 +1279,7 @@
         </div>
 
         <div id="mobileMenu" class="container mobile-menu">
-            <a class="nav-link mobile-link" href="#about">Asbob haqida</a>
+            <a class="nav-link mobile-link" href="#about">Qurilma haqida</a>
             <a class="nav-link mobile-link" href="#how">Jarayon</a>
             <a class="nav-link mobile-link" href="#monitor">Live indikator</a>
             <a class="nav-link mobile-link" href="#farm-map">Fermer xaritasi</a>
@@ -1258,7 +1334,7 @@
 
         <section id="about" class="section">
             <div class="container">
-                <span class="pill" data-reveal>Asbob haqida</span>
+                <span class="pill" data-reveal>Qurilma haqida</span>
                 <h2 class="section-title headline-font" data-reveal style="--delay: 0.08s">Namlikni ko'rib, sug'orishni
                     aniq boshqarish uchun yaratilgan</h2>
                 <p class="section-desc" data-reveal style="--delay: 0.14s">
@@ -1350,11 +1426,11 @@
             <div class="container">
                 <span class="pill" data-reveal>Fermer xaritasi</span>
                 <h2 class="section-title headline-font" data-reveal style="--delay: 0.08s">
-                    Fermer yerini belgilang va o'sha hududdagi suv nazorat asboblarini ko'ring
+                    Fermer yerini belgilang va o'sha hududdagi suv nazorat qurilmalarini ko'ring
                 </h2>
                 <p class="section-desc" data-reveal style="--delay: 0.14s">
                     Xaritada "Fermer yerini belgilash" tugmasini bosing, maydon chegarasini chizing va tanlangan
-                    hudud ichidagi asboblar holatini me'yoridan kam, normal yoki me'yoridan oshiq ko'rinishida foiz
+                    hudud ichidagi qurilmalar holatini me'yoridan kam, normal yoki me'yoridan oshiq ko'rinishida foiz
                     bilan oling.
                 </p>
 
@@ -1378,14 +1454,14 @@
                     </div>
 
                     <div class="device-place-tools">
-                        <button id="startDeviceDropBtn" class="btn btn-secondary map-mini-btn" type="button">Asbobni
+                        <button id="startDeviceDropBtn" class="btn btn-secondary map-mini-btn" type="button">Qurilmani
                             qo'lda joylash</button>
                         <button id="autoDeviceBtn" class="btn btn-secondary map-mini-btn" type="button">Auto
                             lokatsiya qo'shish</button>
                         <button id="cancelDeviceDropBtn" class="btn btn-secondary map-mini-btn" type="button">Joylashni
                             bekor qilish</button>
                     </div>
-                    <p id="devicePlaceHint" class="map-hint">Yer ichida asbob qo'shish uchun avval maydonni
+                    <p id="devicePlaceHint" class="map-hint">Yer ichida qurilma qo'shish uchun avval maydonni
                         belgilang.</p>
 
                     <div id="farmMap" class="farm-map" aria-label="Fermer xaritasi" role="region"></div>
@@ -1396,10 +1472,10 @@
                                 <h3 class="headline-font">Tanlangan yer: <span
                                         id="selectedAreaName">Belgilanmagan</span>
                                 </h3>
-                                <p id="mapSummary">Avval yer maydonini belgilang, keyin asboblar ro'yxati shu yerda
+                                <p id="mapSummary">Avval yer maydonini belgilang, keyin qurilmalar ro'yxati shu yerda
                                     chiqadi.</p>
                             </div>
-                            <div class="device-counter"><span id="selectedCount">0</span> ta asbob</div>
+                            <div class="device-counter"><span id="selectedCount">0</span> ta qurilma</div>
                         </div>
 
                         <div class="status-badges">
@@ -1838,7 +1914,7 @@
             highCount.textContent = String(grouped.high);
 
             if (!sensors.length) {
-                deviceList.innerHTML = "<p class='empty-list'>Tanlangan hududda asbob topilmadi. Boshqa yer belgilang.</p>";
+                deviceList.innerHTML = "<p class='empty-list'>Tanlangan hududda qurilma topilmadi. Boshqa yer belgilang.</p>";
                 return;
             }
 
@@ -1868,6 +1944,32 @@
                     `;
                 })
                 .join('');
+        };
+
+        const buildAreaDevicesPopupHTML = (sensors) => {
+            if (!sensors.length) {
+                return '<p class="area-popup-empty">Bu hudud ichida qurilma topilmadi.</p>';
+            }
+
+            const listHTML = sensors
+                .map((sensor) => {
+                    const status = getSensorStatus(sensor);
+                    return `
+                        <li class="area-popup-item">
+                            <div class="area-popup-top">
+                                <span>${escapeHTML(sensor.code)} · ${escapeHTML(sensor.name)}</span>
+                                <span class="area-popup-state ${status.tone}">${status.label}</span>
+                            </div>
+                            <div class="area-popup-bottom">Namlik: ${sensor.moisture}%</div>
+                        </li>
+                    `;
+                })
+                .join('');
+
+            return `
+                <h4 class="area-popup-title">Hudud qurilmalari (${sensors.length})</h4>
+                <ul class="area-popup-list">${listHTML}</ul>
+            `;
         };
 
         const isPointInPolygon = (point, polygon) => {
@@ -2014,7 +2116,7 @@
                         return {
                             id: String(sensor.id || `manual-${Date.now()}-${index}`),
                             code: String(sensor.code || `Q${index + 1}`),
-                            name: String(sensor.name || "Qo'lda belgilangan asbob"),
+                            name: String(sensor.name || "Qo'lda belgilangan qurilma"),
                             lat,
                             lng,
                             moisture: clampMoisture(sensor.moisture),
@@ -2104,7 +2206,7 @@
                     }).addTo(manualSensorLayer);
 
                     marker.bindPopup(
-                        `<strong>Asbob ${escapeHTML(sensor.code)}</strong><br>${escapeHTML(sensor.name)}<br>${sensor.source === 'auto' ? 'Auto lokatsiya' : "Qo'lda belgilangan"}<br>${status.label}: <strong>${sensor.moisture}%</strong>`
+                        `<strong>Qurilma ${escapeHTML(sensor.code)}</strong><br>${escapeHTML(sensor.name)}<br>${sensor.source === 'auto' ? 'Auto lokatsiya' : "Qo'lda belgilangan"}<br>${status.label}: <strong>${sensor.moisture}%</strong>`
                     );
 
                     sensor.marker = marker;
@@ -2141,7 +2243,31 @@
                 });
             };
 
-            const stopDeviceDropMode = (hintText = "Yer ichida asbob qo'shish uchun tugmani bosing.") => {
+            const updateFarmActionButtons = () => {
+                const hasPolygon = activePolygonLatLngs.length >= 3;
+
+                if (saveFarmBtn) {
+                    saveFarmBtn.disabled = !hasPolygon;
+                }
+
+                if (startDeviceDropBtn) {
+                    startDeviceDropBtn.disabled = !hasPolygon;
+                }
+
+                if (autoDeviceBtn) {
+                    autoDeviceBtn.disabled = !hasPolygon;
+                }
+
+                if (cancelDeviceDropBtn) {
+                    cancelDeviceDropBtn.disabled = !hasPolygon || !isDeviceDropMode;
+                }
+
+                if (!hasPolygon) {
+                    startDeviceDropBtn?.classList.remove('is-active');
+                }
+            };
+
+            const stopDeviceDropMode = (hintText = "Yer ichida qurilma qo'shish uchun tugmani bosing.") => {
                 isDeviceDropMode = false;
                 startDeviceDropBtn?.classList.remove('is-active');
 
@@ -2150,11 +2276,13 @@
                 }
 
                 map.getContainer().style.cursor = '';
+                updateFarmActionButtons();
             };
 
             const startDeviceDropMode = () => {
                 if (activePolygonLatLngs.length < 3) {
-                    mapSummary.textContent = "Avval fermer yerini belgilang, keyin asbob joyini xaritada bosing.";
+                    mapSummary.textContent = "Avval fermer yerini belgilang, keyin qurilma joyini xaritada bosing.";
+                    updateFarmActionButtons();
                     return;
                 }
 
@@ -2165,8 +2293,9 @@
                     devicePlaceHint.textContent = "Qo'lda joylash rejimi yoqildi: endi xaritada tanlangan yer ichiga bitta nuqta bosing.";
                 }
 
-                mapSummary.textContent = "Xaritada asbob nuqtasini belgilang. Faqat tanlangan yer ichida qo'shiladi.";
+                mapSummary.textContent = "Xaritada qurilma nuqtasini belgilang. Faqat tanlangan yer ichida qo'shiladi.";
                 map.getContainer().style.cursor = 'crosshair';
+                updateFarmActionButtons();
             };
 
             const placeSensorInActiveFarm = (lat, lng, source = 'manual') => {
@@ -2178,25 +2307,25 @@
                 const point = { lat: Number(lat), lng: Number(lng) };
 
                 if (!Number.isFinite(point.lat) || !Number.isFinite(point.lng)) {
-                    mapSummary.textContent = "Asbob joylashuvi noto'g'ri formatda keldi.";
+                    mapSummary.textContent = "Qurilma joylashuvi noto'g'ri formatda keldi.";
                     return false;
                 }
 
                 if (!isPointInPolygon(point, activePolygonLatLngs)) {
-                    mapSummary.textContent = "Asbob faqat tanlangan yer ichida qo'yilishi mumkin.";
+                    mapSummary.textContent = "Qurilma faqat tanlangan yer ichida qo'yilishi mumkin.";
                     return false;
                 }
 
-                const moistureInput = window.prompt("Asbob namligi foizini kiriting (0-100):", "55");
+                const moistureInput = window.prompt("Qurilma namligi foizini kiriting (0-100):", "55");
 
                 if (moistureInput === null) {
-                    mapSummary.textContent = "Asbob qo'shish bekor qilindi.";
+                    mapSummary.textContent = "Qurilma qo'shish bekor qilindi.";
                     return false;
                 }
 
-                const customNameInput = window.prompt("Asbob nomini kiriting (ixtiyoriy):", "");
+                const customNameInput = window.prompt("Qurilma nomini kiriting (ixtiyoriy):", "");
                 if (customNameInput === null) {
-                    mapSummary.textContent = "Asbob qo'shish bekor qilindi.";
+                    mapSummary.textContent = "Qurilma qo'shish bekor qilindi.";
                     return false;
                 }
 
@@ -2204,8 +2333,8 @@
                 const deviceName = customNameInput.trim()
                     ? customNameInput.trim()
                     : source === 'auto'
-                        ? `Auto aniqlangan asbob ${nextCode}`
-                        : `Qo'lda belgilangan asbob ${nextCode}`;
+                        ? `Auto aniqlangan qurilma ${nextCode}`
+                        : `Qo'lda belgilangan qurilma ${nextCode}`;
 
                 activeManualSensors.push({
                     id: `manual-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
@@ -2225,8 +2354,8 @@
                 syncActiveFarmManualSensors();
 
                 mapSummary.textContent = source === 'auto'
-                    ? `${nextCode} asbob auto lokatsiya orqali qo'shildi.`
-                    : `${nextCode} asbob qo'lda joylashtirildi.`;
+                    ? `${nextCode} qurilma auto lokatsiya orqali qo'shildi.`
+                    : `${nextCode} qurilma qo'lda joylashtirildi.`;
 
                 return true;
             };
@@ -2243,7 +2372,7 @@
                 }).addTo(map);
 
                 marker.bindPopup(
-                    `<strong>Asbob ${escapeHTML(sensor.code)}</strong><br>${escapeHTML(sensor.name)}<br>${status.label}: <strong>${sensor.moisture}%</strong>`
+                    `<strong>Qurilma ${escapeHTML(sensor.code)}</strong><br>${escapeHTML(sensor.name)}<br>${status.label}: <strong>${sensor.moisture}%</strong>`
                 );
 
                 sensor.marker = marker;
@@ -2285,6 +2414,37 @@
                 return [...baseSensors, ...manualSensors];
             };
 
+            const showAreaDevicesListAtPoint = (latlng) => {
+                if (!latlng || activePolygonLatLngs.length < 3) {
+                    return;
+                }
+
+                const selectedSensors = selectedSensorsFromPolygon(activePolygonLatLngs);
+                renderDeviceList(selectedSensors);
+                highlightSensorMarkers(selectedSensors);
+
+                if (selectedSensors.length) {
+                    mapSummary.textContent = `Tanlangan hududda ${selectedSensors.length} ta qurilma bor.`;
+                } else {
+                    mapSummary.textContent = "Tanlangan hudud ichida qurilma topilmadi.";
+                }
+
+                const popupHTML = buildAreaDevicesPopupHTML(selectedSensors);
+
+                L.popup({
+                    className: 'area-devices-popup',
+                    maxWidth: 340,
+                    autoPan: true,
+                    closeButton: true,
+                    offset: [0, -2]
+                })
+                    .setLatLng(latlng)
+                    .setContent(popupHTML)
+                    .openOn(map);
+
+                deviceList?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            };
+
             const summarizeSelection = (polygonLatLngs) => {
                 const selectedSensors = selectedSensorsFromPolygon(polygonLatLngs);
 
@@ -2300,7 +2460,7 @@
                 if (selectedSensors.length) {
                     mapSummary.textContent = `Maydon hajmi ${areaHectare.toFixed(2)} ga. O'rtacha namlik ${averageMoisture}% bo'ldi.`;
                 } else {
-                    mapSummary.textContent = `Maydon hajmi ${areaHectare.toFixed(2)} ga. Bu hududda asbob aniqlanmadi.`;
+                    mapSummary.textContent = `Maydon hajmi ${areaHectare.toFixed(2)} ga. Bu hududda qurilma aniqlanmadi.`;
                 }
 
                 renderDeviceList(selectedSensors);
@@ -2314,7 +2474,8 @@
                 }
 
                 activePolygonLatLngs = [];
-                stopDeviceDropMode("Yer ichida asbob qo'shish uchun avval yangi maydonni belgilang.");
+                stopDeviceDropMode("Yer ichida qurilma qo'shish uchun avval yangi maydonni belgilang.");
+                updateFarmActionButtons();
             };
 
             const setActivePolygon = (polygonLatLngs, options = { fit: true }) => {
@@ -2326,7 +2487,19 @@
                 clearActivePolygon();
                 activePolygonLatLngs = normalized;
                 activePolygonLayer = L.polygon(activePolygonLatLngs, polygonStyle).addTo(parcelLayer);
+                activePolygonLayer.on('click', (event) => {
+                    if (isDeviceDropMode) {
+                        return;
+                    }
+
+                    if (event?.originalEvent) {
+                        L.DomEvent.stopPropagation(event.originalEvent);
+                    }
+
+                    showAreaDevicesListAtPoint(event.latlng);
+                });
                 summarizeSelection(activePolygonLatLngs);
+                updateFarmActionButtons();
 
                 if (options.fit) {
                     map.fitBounds(activePolygonLayer.getBounds(), { padding: [24, 24] });
@@ -2341,7 +2514,7 @@
                 }
 
                 selectedAreaName.textContent = 'Belgilanmagan';
-                mapSummary.textContent = "Avval yer maydonini belgilang, keyin asboblar ro'yxati shu yerda chiqadi.";
+                mapSummary.textContent = "Avval yer maydonini belgilang, keyin qurilmalar ro'yxati shu yerda chiqadi.";
 
                 if (deviceList) {
                     deviceList.innerHTML = "<p class='empty-list'>Ro'yxat hozircha bo'sh. Xaritada maydon belgilang.</p>";
@@ -2367,7 +2540,8 @@
                 renderManualSensorMarkers();
                 syncManualSequence();
                 highlightSensorMarkers(null);
-                stopDeviceDropMode("Yer ichida asbob qo'shish uchun tugmani bosing.");
+                stopDeviceDropMode("Yer ichida qurilma qo'shish uchun tugmani bosing.");
+                updateFarmActionButtons();
             };
 
             const loadSavedFarms = () => {
@@ -2480,17 +2654,27 @@
                 renderManualSensorMarkers();
                 setActivePolygon(readPolygonLatLngs(event.layer));
                 refreshSavedFarmsUI();
-                stopDeviceDropMode("Yangi maydon tayyor. Endi asbob joyini ham belgilashingiz mumkin.");
+                stopDeviceDropMode("Yangi maydon tayyor. Endi qurilma joyini ham belgilashingiz mumkin.");
             });
 
             map.on('click', (event) => {
+                if (drawHandler && typeof drawHandler.enabled === 'function' && drawHandler.enabled()) {
+                    return;
+                }
+
                 if (!isDeviceDropMode) {
+                    if (activePolygonLatLngs.length >= 3) {
+                        const point = { lat: event.latlng.lat, lng: event.latlng.lng };
+                        if (isPointInPolygon(point, activePolygonLatLngs)) {
+                            showAreaDevicesListAtPoint(event.latlng);
+                        }
+                    }
                     return;
                 }
 
                 const isPlaced = placeSensorInActiveFarm(event.latlng.lat, event.latlng.lng, 'manual');
                 if (isPlaced) {
-                    stopDeviceDropMode("Asbob joylashtirildi. Kerak bo'lsa yana qo'shish uchun tugmani qayta bosing.");
+                    stopDeviceDropMode("Qurilma joylashtirildi. Kerak bo'lsa yana qo'shish uchun tugmani qayta bosing.");
                 }
             });
 
@@ -2508,6 +2692,7 @@
                 drawHandler = new L.Draw.Polygon(map, polygonOptions);
                 drawHandler.enable();
                 mapSummary.textContent = "Maydon chegarasini chizing: burchaklarni bosing va so'ng yopib tugating.";
+                updateFarmActionButtons();
             });
 
             startDeviceDropBtn?.addEventListener('click', () => {
@@ -2625,6 +2810,7 @@
 
             loadSavedFarms();
             restoreLastFarm();
+            updateFarmActionButtons();
 
             const onMapResize = () => map.invalidateSize();
 
